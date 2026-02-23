@@ -17,13 +17,17 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle
 
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v3
+    # 使用 gradle/actions/setup-gradle 替代已弃用的 gradle-build-action
+    # 并显式指定 Gradle 8.0 版本，避免版本不兼容问题
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: current
-        arguments: assembleDebug
+        gradle-version: '8.0'
+        
+    # 直接使用 gradle 命令构建，避开本地缺失 gradle-wrapper.jar 的问题
+    - name: Build with Gradle
+      run: gradle assembleDebug --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
