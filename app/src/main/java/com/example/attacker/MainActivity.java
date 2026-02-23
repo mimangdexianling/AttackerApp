@@ -50,7 +50,15 @@ public class MainActivity extends Activity {
             intent.putExtra("web_url", payload);
             intent.putExtra("link", payload);
             intent.putExtra("data", payload);
-            intent.putExtra("contents", payload); // 保留之前的 key
+            intent.putExtra("contents", payload);
+            // 添加之前注释中提到的关键 Key
+            intent.putExtra("extra_session_kewen", payload);
+            intent.putExtra("session_kewen", payload);
+            intent.putExtra("kewen", payload);
+            intent.putExtra("session", payload);
+            intent.putExtra("bean", payload);
+            intent.putExtra("entity", payload);
+            intent.putExtra("info", payload);
             
             // 如果目标 Activity 只是简单的 loadUrl(intent.getStringExtra("..."))
             // 那么 javascript: 协议将会在当前 WebView 上下文中执行 JS。
