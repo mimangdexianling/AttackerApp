@@ -22,9 +22,10 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: '8.0'
+        cache-disabled: true # 禁用缓存以避免 GitHub 缓存服务故障导致的构建失败
         
     - name: Build with Gradle
-      run: gradle assembleDebug -x lint --stacktrace --no-daemon
+      run: gradle assembleDebug -x lint --stacktrace --no-daemon --refresh-dependencies
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
